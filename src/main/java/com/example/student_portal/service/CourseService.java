@@ -11,7 +11,6 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
 
-    // constructor injection
     public CourseService(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
     }
@@ -32,6 +31,18 @@ public class CourseService {
 
     public Course createCourse(Course course) {
         return courseRepository.save(course);
+    }
+
+    public Course updateCourse(Long id, Course request) {
+        Course existingCourse = courseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
+
+        existingCourse.setCourseCode(request.getCourseCode());
+        existingCourse.setTitle(request.getTitle());
+        existingCourse.setDescription(request.getDescription());
+        existingCourse.setFee(request.getFee());
+
+        return courseRepository.save(existingCourse);
     }
 
     public void deleteCourse(Long id) {
