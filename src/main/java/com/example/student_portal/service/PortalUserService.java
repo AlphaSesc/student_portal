@@ -2,6 +2,7 @@ package com.example.student_portal.service;
 
 import com.example.student_portal.entity.PortalUser;
 import com.example.student_portal.repository.PortalUserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -10,12 +11,18 @@ import java.util.Optional;
 public class PortalUserService {
 
     private final PortalUserRepository portalUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public PortalUserService(PortalUserRepository portalUserRepository) {
+    public PortalUserService(PortalUserRepository portalUserRepository, PasswordEncoder passwordEncoder) {
         this.portalUserRepository = portalUserRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public PortalUser registerUser(PortalUser user) {
+        if (portalUserRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already registered");
+        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return portalUserRepository.save(user);
     }
 
