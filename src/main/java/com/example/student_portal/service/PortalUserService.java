@@ -29,4 +29,15 @@ public class PortalUserService {
     public Optional<PortalUser> findByUsername(String email) {
         return portalUserRepository.findByEmail(email);
     }
+
+    public PortalUser authenticate(String email, String password) {
+        PortalUser user = portalUserRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        return user;
+    }
 }
