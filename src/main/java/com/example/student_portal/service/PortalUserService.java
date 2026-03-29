@@ -1,6 +1,9 @@
 package com.example.student_portal.service;
 
 import com.example.student_portal.entity.PortalUser;
+import com.example.student_portal.exception.InvalidCredentialsException;
+import com.example.student_portal.exception.UserNotFoundException;
+import com.example.student_portal.exception.ResourceAlreadyExistsException;
 import com.example.student_portal.repository.PortalUserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,7 +23,7 @@ public class PortalUserService {
 
     public PortalUser registerUser(PortalUser user) {
         if (portalUserRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already registered");
+            throw new ResourceAlreadyExistsException("Email already registered");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return portalUserRepository.save(user);
