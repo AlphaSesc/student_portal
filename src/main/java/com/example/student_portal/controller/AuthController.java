@@ -5,6 +5,7 @@ import com.example.student_portal.dto.LoginResponse;
 import com.example.student_portal.dto.RegisterRequest;
 import com.example.student_portal.entity.PortalUser;
 import com.example.student_portal.service.PortalUserService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,7 +19,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public PortalUser register(@RequestBody RegisterRequest request) {
+    public PortalUser register(@Valid @RequestBody RegisterRequest request) {
         System.out.println("Register endpoint hit");
         PortalUser user = PortalUser.builder()
                 .email(request.getEmail())
@@ -29,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         PortalUser user = portalUserService.authenticate(
                 request.getEmail(),
                 request.getPassword()
