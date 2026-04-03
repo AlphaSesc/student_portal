@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +62,25 @@ public class EnrollmentService {
                 .courseTitle(course.getTitle())
                 .enrolledAt(savedEnrollment.getEnrolledAt())
                 .build();
+    }
+
+    public List<EnrollmentResponse> getMyEnrollments() {
+        PortalUser portalUser = getLoggedInPortalUser();
+
+        Student student = studentRepository.findByPortalUser(portalUser)
+                .orElseThrow(() -> new ResourceNotFoundException("Student profile not found"));
+
+        return enrollmentRepository.findByStudent(student)
+                .stream()
+                .map(enrollment -> EnrollmentResponse.builder()
+                        .enrollmentId(enrollment.getId())
+                        .studentId(student.getStudentId())
+                        .courseId(enrollment.getCourse().getId())
+                        .courseCode(enrollment.getCourse().getCourseCode())
+                        .courseTitle(enrollment.getCourse().getTitle())
+                        .enrolledAt(enrollment.getEnrolledAt())
+                        .build())
+                .toList();
     }
 
     private Student createStudentForFirstEnrollment(PortalUser portalUser) {
