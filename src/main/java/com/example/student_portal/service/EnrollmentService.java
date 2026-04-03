@@ -25,9 +25,10 @@ public class EnrollmentService {
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
     private final PortalUserRepository portalUserRepository;
+    private final AuthenticatedUserService authenticatedUserService;
 
     public EnrollmentResponse enroll(EnrollmentRequest request) {
-        PortalUser portalUser = getLoggedInPortalUser();
+        PortalUser portalUser = authenticatedUserService.getCurrentStudentUser();;
 
         Course course = courseRepository.findById(request.getCourseId())
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
@@ -59,7 +60,7 @@ public class EnrollmentService {
     }
 
     public List<EnrollmentResponse> getMyEnrollments() {
-        PortalUser portalUser = getLoggedInPortalUser();
+        PortalUser portalUser = authenticatedUserService.getCurrentStudentUser();
 
         Student student = studentRepository.findByPortalUser(portalUser)
                 .orElseThrow(() -> new ResourceNotFoundException("Student profile not found"));
@@ -86,22 +87,4 @@ public class EnrollmentService {
         return studentRepository.save(student);
     }
 
-    private PortalUser getLoggedInPortalUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || authentication.getName() == null) {
-            throw new UserNotFoundException("Authenticated user not found");
-        }
-
-        String email = authentication.getName();
-
-        PortalUser portalUser = portalUserRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not Found"));
-
-        if (portalUser.getRole() != UserRole.STUDENT) {
-            throw new UnauthorizedOperationException("Only students can access enrollment features");
-        }
-
-        return portalUser;
     }
-}
