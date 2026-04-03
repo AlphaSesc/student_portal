@@ -2,14 +2,8 @@ package com.example.student_portal.service;
 
 import com.example.student_portal.dto.EnrollmentRequest;
 import com.example.student_portal.dto.EnrollmentResponse;
-import com.example.student_portal.entity.Course;
-import com.example.student_portal.entity.Enrollment;
-import com.example.student_portal.entity.PortalUser;
-import com.example.student_portal.entity.Student;
-import com.example.student_portal.exception.BusinessException;
-import com.example.student_portal.exception.ResourceAlreadyExistsException;
-import com.example.student_portal.exception.ResourceNotFoundException;
-import com.example.student_portal.exception.UserNotFoundException;
+import com.example.student_portal.entity.*;
+import com.example.student_portal.exception.*;
 import com.example.student_portal.repository.CourseRepository;
 import com.example.student_portal.repository.EnrollmentRepository;
 import com.example.student_portal.repository.PortalUserRepository;
@@ -101,7 +95,13 @@ public class EnrollmentService {
 
         String email = authentication.getName();
 
-        return portalUserRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        PortalUser portalUser = portalUserRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not Found"));
+
+        if (portalUser.getRole() != UserRole.STUDENT) {
+            throw new UnauthorizedOperationException("Only students can access enrollment features");
+        }
+
+        return portalUser;
     }
 }

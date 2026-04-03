@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/enrollments")
 @RequiredArgsConstructor
@@ -17,5 +19,10 @@ public class EnrollmentController {
     @PostMapping
     public EnrollmentResponse enroll(@Valid @RequestBody EnrollmentRequest request) {
         return enrollmentService.enroll(request);
+    }
+
+    @GetMapping("/me")
+    public List<EnrollmentResponse> getMyEnrollments() {
+        return enrollmentService.getMyEnrollments();
     }
 }
