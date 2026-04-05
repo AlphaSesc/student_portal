@@ -8,3 +8,6 @@ spring:
   profiles:
     active: dev
 
+finance:
+  service:
+    base-url: http://localhost:8080

@@ -1,5 +1,7 @@
 package com.example.student_portal.service;
 
+import com.example.student_portal.client.FinanceClient;
+import com.example.student_portal.dto.GraduationEligibilityResponse;
 import com.example.student_portal.dto.StudentProfileResponse;
 import com.example.student_portal.dto.UpdateStudentProfileRequest;
 import com.example.student_portal.entity.PortalUser;
@@ -22,6 +24,7 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final PortalUserRepository portalUserRepository;
     private final AuthenticatedUserService authenticatedUserService;
+    private final FinanceClient financeClient;
 
     public StudentProfileResponse getMyProfile() {
         PortalUser portalUser = authenticatedUserService.getCurrentStudentUser();
@@ -56,6 +59,25 @@ public class StudentService {
                 .phone(student.getPhone())
                 .address(student.getAddress())
                 .email(portalUser.getEmail())
+                .build();
+    }
+
+    public GraduationEligibilityResponse checkGraduationEligibility() {
+        PortalUser portalUser = authenticatedUserService.getCurrentStudentUser();
+
+        Student student = studentRepository.findByPortalUser(portalUser)
+                .orElseThrow(() -> new ResourceNotFoundException("Student profile not found"));
+
+        var balanceResponse = financeClient.checkOutstandingBalance(student.getStudentId());
+
+        boolean eligible = !balanceResponse.isHasOutstandingBalance();
+
+        return GraduationEligibilityResponse.builder()
+                .studentId(student.getStudentId())
+                .eligible(eligible)
+                .message(eligible
+                        ? "Student is eligible to graduate"
+                        : "Student is not eligible to graduate due to outstanding invoices")
                 .build();
     }
 

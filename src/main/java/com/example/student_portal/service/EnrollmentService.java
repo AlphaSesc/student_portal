@@ -1,5 +1,6 @@
 package com.example.student_portal.service;
 
+import com.example.student_portal.client.FinanceClient;
 import com.example.student_portal.dto.EnrollmentRequest;
 import com.example.student_portal.dto.EnrollmentResponse;
 import com.example.student_portal.entity.*;
@@ -9,6 +10,7 @@ import com.example.student_portal.repository.EnrollmentRepository;
 import com.example.student_portal.repository.PortalUserRepository;
 import com.example.student_portal.repository.StudentRepository;
 import com.example.student_portal.util.StudentIdGenerator;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,7 +28,9 @@ public class EnrollmentService {
     private final CourseRepository courseRepository;
     private final PortalUserRepository portalUserRepository;
     private final AuthenticatedUserService authenticatedUserService;
+    private final FinanceClient financeClient;
 
+    @Transactional
     public EnrollmentResponse enroll(EnrollmentRequest request) {
         PortalUser portalUser = authenticatedUserService.getCurrentStudentUser();;
 
@@ -48,6 +52,14 @@ public class EnrollmentService {
                 .build();
 
         Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
+
+        financeClient.createInvoice(
+                com.example.student_portal.dto.finance.CreateInvoiceRequest.builder()
+                        .studentId(student.getStudentId())
+                        .courseCode(course.getCourseCode())
+                        .amount(course.getFee())
+                        .build()
+        );
 
         return EnrollmentResponse.builder()
                 .enrollmentId(savedEnrollment.getId())
@@ -84,7 +96,16 @@ public class EnrollmentService {
                 .portalUser(portalUser)
                 .build();
 
-        return studentRepository.save(student);
+        Student savedStudent = studentRepository.save(student);
+
+        financeClient.createAccount(
+                com.example.student_portal.dto.finance.CreateFinanceAccountRequest.builder()
+                        .studentId(savedStudent.getStudentId())
+                        .email(portalUser.getEmail())
+                        .build()
+        );
+
+        return savedStudent;
     }
 
     }
