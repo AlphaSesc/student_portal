@@ -1,6 +1,7 @@
 package com.example.student_portal.service;
 
 import com.example.student_portal.client.FinanceClient;
+import com.example.student_portal.client.LibraryClient;
 import com.example.student_portal.dto.EnrollmentRequest;
 import com.example.student_portal.dto.EnrollmentResponse;
 import com.example.student_portal.entity.*;
@@ -29,6 +30,7 @@ public class EnrollmentService {
     private final PortalUserRepository portalUserRepository;
     private final AuthenticatedUserService authenticatedUserService;
     private final FinanceClient financeClient;
+    private final LibraryClient libraryClient;
 
     @Transactional
     public EnrollmentResponse enroll(EnrollmentRequest request) {
@@ -102,6 +104,12 @@ public class EnrollmentService {
                 com.example.student_portal.dto.finance.CreateFinanceAccountRequest.builder()
                         .studentId(savedStudent.getStudentId())
                         .email(portalUser.getEmail())
+                        .build()
+        );
+
+        libraryClient.registerStudent(
+                com.example.student_portal.dto.library.CreateLibraryAccountRequest.builder()
+                        .studentId(savedStudent.getStudentId())
                         .build()
         );
 
