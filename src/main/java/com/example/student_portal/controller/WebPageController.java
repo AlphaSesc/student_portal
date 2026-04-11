@@ -29,10 +29,15 @@ public class WebPageController {
         return "student/dashboard";
     }
 
-//    @GetMapping("/courses")
-//    public String coursesPage() {
-//        return "student/courses";
-//    }
+    @GetMapping("/courses")
+    public String coursesPage() {
+        return "student/courses";
+    }
+
+    @GetMapping("/courses/{id}")
+    public String courseDetailPage() {
+        return "student/course-details";
+    }
 //
 //    @GetMapping("/enrolments")
 //    public String enrolmentsPage() {

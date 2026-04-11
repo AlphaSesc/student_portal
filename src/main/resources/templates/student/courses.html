@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Courses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Available Courses</h2>
+        <div>
+            <a th:href="@{/dashboard}" class="btn btn-secondary btn-sm me-2">Dashboard</a>
+            <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div id="message"></div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Course Code</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Fee</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="coursesTableBody">
+                    <tr>
+                        <td colspan="6" class="text-center">Loading courses...</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const token = localStorage.getItem("token");
+    const messageBox = document.getElementById("message");
+    const tableBody = document.getElementById("coursesTableBody");
+
+    if (!token) {
+        window.location.href = [[ @{/login} ]];
+    }
+
+        async function loadCourses() {
+            try {
+                const response = await fetch([[ @{/api/courses} ]], {
+                    method: "GET",
+                        headers: {
+                        "Authorization": "Bearer " + token
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.clear();
+                    window.location.href = [[ @{/login} ]];
+                    return;
+                }
+
+                    if (!response.ok) {
+                        tableBody.innerHTML =
+                            `<tr><td colspan="6" class="text-center text-danger">Failed to load courses.</td></tr>`;
+                        return;
+                    }
+
+                    const courses = await response.json();
+
+                    if (!courses || courses.length === 0) {
+                        tableBody.innerHTML =
+                            `<tr><td colspan="6" class="text-center">No courses available.</td></tr>`;
+                        return;
+                    }
+
+                    tableBody.innerHTML = "";
+
+                    courses.forEach(course => {
+                        const row = `
+                    <tr>
+                        <td>${course.id}</td>
+                        <td>${course.courseCode}</td>
+                        <td>${course.title}</td>
+                        <td>${course.description ?? ''}</td>
+                        <td>${course.fee}</td>
+                        <td>
+                            <a href="/courses/${course.id}" class="btn btn-outline-primary btn-sm me-2">View</a>
+                            <button class="btn btn-success btn-sm" onclick="enrollInCourse(${course.id})">Enroll</button>
+                        </td>
+                    </tr>
+                `;
+                        tableBody.innerHTML += row;
+                    });
+
+                } catch (error) {
+                    tableBody.innerHTML =
+                        `<tr><td colspan="6" class="text-center text-danger">Something went wrong while loading courses.</td></tr>`;
+                }
+            }
+
+            async function enrollInCourse(courseId) {
+                messageBox.innerHTML = "";
+
+                try {
+                    const response = await fetch('/api/enrolments', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify({
+                            courseId: courseId
+                        })
+                    });
+
+                    let result = null;
+                    const contentType = response.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                        result = await response.json();
+                    }
+
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.clear();
+                        window.location.href = [[ @{/login} ]];
+                        return;
+                    }
+
+                        if (response.ok) {
+                            messageBox.innerHTML =
+                                `<div class="alert alert-success">Enrolled successfully.</div>`;
+                        } else {
+                            const errorMessage = result?.message || 'Enrollment failed.';
+                            messageBox.innerHTML =
+                                `<div class="alert alert-danger">${errorMessage}</div>`;
+                        }
+                    } catch (error) {
+                        messageBox.innerHTML =
+                            `<div class="alert alert-danger">Something went wrong while enrolling.</div>`;
+                    }
+                }
+
+                function logout() {
+                    localStorage.clear();
+                    window.location.href = [[ @{/login} ]];
+                }
+
+                    loadCourses();
+</script>
+
+</body>
+</html>

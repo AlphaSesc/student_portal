@@ -1,6 +1,7 @@
 package com.example.student_portal.service;
 
 import com.example.student_portal.entity.Course;
+import com.example.student_portal.exception.ResourceNotFoundException;
 import com.example.student_portal.repository.CourseRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class CourseService {
 
     public Course getCourseById(Long id) {
         return courseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
     }
 
     public Course getByCourseCode(String courseCode) {
