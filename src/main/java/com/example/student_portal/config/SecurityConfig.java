@@ -55,6 +55,7 @@ public class SecurityConfig {
                                 "/courses",
                                 "/courses/**",
                                 "/my-enrollments",
+                                "/student-profile",
                                 "/css/**",
                                 "/js/**")
                         .permitAll()

@@ -44,10 +44,10 @@ public class WebPageController {
         return "student/my-enrollments";
     }
 
-//    @GetMapping("/profile")
-//    public String profilePage() {
-//        return "student/profile";
-//    }
+    @GetMapping("/student-profile")
+    public String profilePage() {
+        return "student/student-profile";
+    }
 //
 //    @GetMapping("/graduation")
 //    public String graduationPage() {
