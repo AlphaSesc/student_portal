@@ -48,11 +48,11 @@ public class WebPageController {
     public String profilePage() {
         return "student/student-profile";
     }
-//
-//    @GetMapping("/graduation")
-//    public String graduationPage() {
-//        return "student/graduation";
-//    }
+
+    @GetMapping("/graduation-eligibility")
+    public String graduationPage() {
+        return "student/graduation-eligibility";
+    }
 //
 //    @GetMapping("/invoices")
 //    public String invoicesPage() {

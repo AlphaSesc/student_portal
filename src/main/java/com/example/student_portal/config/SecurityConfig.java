@@ -55,6 +55,7 @@ public class SecurityConfig {
                                 "/courses",
                                 "/courses/**",
                                 "/my-enrollments",
+                                "/graduation-eligibility",
                                 "/student-profile",
                                 "/css/**",
                                 "/js/**")
