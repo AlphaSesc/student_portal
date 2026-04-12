@@ -38,12 +38,12 @@ public class WebPageController {
     public String courseDetailPage() {
         return "student/course-details";
     }
-//
-//    @GetMapping("/enrolments")
-//    public String enrolmentsPage() {
-//        return "student/enrolments";
-//    }
-//
+
+    @GetMapping("/my-enrollments")
+    public String enrolmentsPage() {
+        return "student/my-enrollments";
+    }
+
 //    @GetMapping("/profile")
 //    public String profilePage() {
 //        return "student/profile";
