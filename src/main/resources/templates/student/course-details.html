@@ -39,6 +39,7 @@
 
         async function loadCourse() {
             try {
+                // Fetch course details
                 const response = await fetch(`/api/courses/${courseId}`, {
                     method: "GET",
                     headers: {
@@ -61,68 +62,100 @@
                         return;
                     }
 
-                    courseContainer.innerHTML = `
+                    // Check enrollment status
+                    let isEnrolled = false;
+
+                    try {
+                        const enrollmentsResponse = await fetch('/api/enrollments/me', {
+                            method: "GET",
+                            headers: {
+                                "Authorization": "Bearer " + token
+                            }
+                        });
+
+                        if (enrollmentsResponse.status === 401 || enrollmentsResponse.status === 403) {
+                            localStorage.clear();
+                            window.location.href = [[ @{/login} ]];
+                            return;
+                        }
+
+                            if (enrollmentsResponse.ok) {
+                                const enrollments = await enrollmentsResponse.json();
+                                const enrolledCourseIds = enrollments.map(e => e.courseId);
+                                isEnrolled = enrolledCourseIds.includes(result.id);
+                            }
+                        } catch (error) {
+                            console.log("Could not check enrollment status");
+                        }
+
+                        const button = isEnrolled
+                            ? `<button class="btn btn-secondary mt-2" disabled>Enrolled</button>`
+                            : `<button class="btn btn-success mt-2" onclick="enrollInCourse(${result.id})">Enroll</button>`;
+
+                        courseContainer.innerHTML = `
                 <h4 class="mb-3">${result.title}</h4>
                 <p><strong>ID:</strong> ${result.id}</p>
                 <p><strong>Course Code:</strong> ${result.courseCode}</p>
                 <p><strong>Description:</strong> ${result.description ?? ''}</p>
                 <p><strong>Fee:</strong> ${result.fee}</p>
-                <button class="btn btn-success mt-2" onclick="enrollInCourse(${result.id})">Enroll</button>
+                ${button}
             `;
-                } catch (error) {
-                    courseContainer.innerHTML = "";
-                    messageBox.innerHTML =
-                        `<div class="alert alert-danger">Something went wrong while loading course details.</div>`;
+
+                    } catch (error) {
+                        courseContainer.innerHTML = "";
+                        messageBox.innerHTML =
+                            `<div class="alert alert-danger">Something went wrong while loading course details.</div>`;
+                    }
                 }
-            }
 
-            async function enrollInCourse(courseId) {
-                messageBox.innerHTML = "";
+                async function enrollInCourse(courseId) {
+                    messageBox.innerHTML = "";
 
-                try {
-                    const response = await fetch('/api/enrolments', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: JSON.stringify({
-                            courseId: courseId
-                        })
-                    });
+                    try {
+                        const response = await fetch('/api/enrollments', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + token
+                            },
+                            body: JSON.stringify({
+                                courseId: courseId
+                            })
+                        });
 
-                    let result = null;
-                    const contentType = response.headers.get("content-type");
-                    if (contentType && contentType.includes("application/json")) {
-                        result = await response.json();
+                        let result = null;
+                        const contentType = response.headers.get("content-type");
+                        if (contentType && contentType.includes("application/json")) {
+                            result = await response.json();
+                        }
+
+                        if (response.status === 401 || response.status === 403) {
+                            localStorage.clear();
+                            window.location.href = [[ @{/login} ]];
+                            return;
+                        }
+
+                            if (response.ok) {
+                                messageBox.innerHTML =
+                                    `<div class="alert alert-success">Enrolled successfully.</div>`;
+                                loadCourse(); // refresh button to "Enrolled"
+                            } else {
+                                const errorMessage = result?.message || 'Enrollment failed.';
+                                messageBox.innerHTML =
+                                    `<div class="alert alert-danger">${errorMessage}</div>`;
+                            }
+                        } catch (error) {
+                            messageBox.innerHTML =
+                                `<div class="alert alert-danger">Something went wrong while enrolling.</div>`;
+                        }
                     }
 
-                    if (response.status === 401 || response.status === 403) {
+                    function logout() {
                         localStorage.clear();
                         window.location.href = [[ @{/login} ]];
-                        return;
                     }
 
-                        if (response.ok) {
-                            messageBox.innerHTML =
-                                `<div class="alert alert-success">Enrolled successfully.</div>`;
-                        } else {
-                            const errorMessage = result?.message || 'Enrollment failed.';
-                            messageBox.innerHTML =
-                                `<div class="alert alert-danger">${errorMessage}</div>`;
-                        }
-                    } catch (error) {
-                        messageBox.innerHTML =
-                            `<div class="alert alert-danger">Something went wrong while enrolling.</div>`;
-                    }
-                }
-
-                function logout() {
-                    localStorage.clear();
-                    window.location.href = [[ @{/login} ]];
-                }
-
-                    loadCourse();
+                        loadCourse();
 </script>
 
 </body>
