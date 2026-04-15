@@ -4,6 +4,7 @@ import com.example.student_portal.client.FinanceClient;
 import com.example.student_portal.client.LibraryClient;
 import com.example.student_portal.dto.EnrollmentRequest;
 import com.example.student_portal.dto.EnrollmentResponse;
+import com.example.student_portal.dto.finance.InvoiceType;
 import com.example.student_portal.entity.*;
 import com.example.student_portal.exception.*;
 import com.example.student_portal.repository.CourseRepository;
@@ -59,6 +60,7 @@ public class EnrollmentService {
                 com.example.student_portal.dto.finance.CreateInvoiceRequest.builder()
                         .studentId(student.getStudentId())
                         .courseCode(course.getCourseCode())
+                        .invoiceType(InvoiceType.COURSE_ENROLLMENT)
                         .amount(course.getFee())
                         .build()
         );

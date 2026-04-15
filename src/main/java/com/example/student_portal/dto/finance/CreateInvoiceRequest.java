@@ -13,4 +13,5 @@ public class CreateInvoiceRequest {
     private String studentId;
     private String courseCode;
     private BigDecimal amount;
+    private InvoiceType invoiceType;
 }
