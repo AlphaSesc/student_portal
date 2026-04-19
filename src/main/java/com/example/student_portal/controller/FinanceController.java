@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/finance")
 @RequiredArgsConstructor
@@ -17,5 +19,10 @@ public class FinanceController {
     @PostMapping("/pay")
     public PayInvoiceResponse payInvoice(@RequestBody StudentPayInvoiceRequest request) {
         return financeService.payInvoice(request);
+    }
+
+    @GetMapping("/my-invoices")
+    public List<PayInvoiceResponse> getMyInvoices() {
+        return financeService.getMyInvoices();
     }
 }

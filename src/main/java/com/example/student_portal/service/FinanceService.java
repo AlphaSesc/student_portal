@@ -11,6 +11,9 @@ import com.example.student_portal.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class FinanceService {
@@ -30,5 +33,16 @@ public class FinanceService {
         payInvoiceRequest.setReference(request.getReference());
 
         return financeClient.payInvoice(payInvoiceRequest);
+    }
+
+    public List<PayInvoiceResponse> getMyInvoices() {
+        PortalUser portalUser = authenticatedUserService.getCurrentStudentUser();
+
+        Student student = studentRepository.findByPortalUser(portalUser)
+                .orElseThrow(() -> new UserNotFoundException("Student profile not found"));
+
+        PayInvoiceResponse[] invoices = financeClient.getInvoicesByStudentId(student.getStudentId());
+
+        return invoices == null ? List.of() : Arrays.asList(invoices);
     }
 }

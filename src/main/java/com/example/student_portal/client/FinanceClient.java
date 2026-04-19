@@ -63,4 +63,15 @@ public class FinanceClient {
             throw new ExternalServiceException("Failed to pay invoice in finance service");
         }
     }
+
+    public PayInvoiceResponse[] getInvoicesByStudentId(String studentId) {
+        try {
+            return restTemplate.getForObject(
+                    financeBaseUrl + "/api/invoices/student/" + studentId,
+                    PayInvoiceResponse[].class
+            );
+        } catch (RestClientException ex) {
+            throw new ExternalServiceException("Failed to fetch invoices from finance service");
+        }
+    }
 }
