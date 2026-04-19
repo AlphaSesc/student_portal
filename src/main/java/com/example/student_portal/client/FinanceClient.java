@@ -1,8 +1,6 @@
 package com.example.student_portal.client;
 
-import com.example.student_portal.dto.finance.CreateFinanceAccountRequest;
-import com.example.student_portal.dto.finance.CreateInvoiceRequest;
-import com.example.student_portal.dto.finance.OutstandingBalanceResponse;
+import com.example.student_portal.dto.finance.*;
 import com.example.student_portal.exception.ExternalServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +49,18 @@ public class FinanceClient {
             );
         } catch (RestClientException ex) {
             throw new ExternalServiceException("Failed to check outstanding balance from finance service");
+        }
+    }
+
+    public PayInvoiceResponse payInvoice(PayInvoiceRequest request) {
+        try {
+            return restTemplate.postForObject(
+                    financeBaseUrl + "/api/invoices/pay",
+                    request,
+                    PayInvoiceResponse.class
+            );
+        } catch (RestClientException ex) {
+            throw new ExternalServiceException("Failed to pay invoice in finance service");
         }
     }
 }
