@@ -58,6 +58,7 @@ public class SecurityConfig {
                                 "/graduation-eligibility",
                                 "/student-profile",
                                 "/my-invoices",
+                                "/pay-invoice",
                                 "/css/**",
                                 "/js/**")
                         .permitAll()

@@ -58,4 +58,9 @@ public class WebPageController {
     public String myInvoices() {
         return "student/my-invoices";
     }
+
+    @GetMapping("/pay-invoice")
+    public String payInvoicePage() {
+        return "student/pay-invoice";
+    }
 }
