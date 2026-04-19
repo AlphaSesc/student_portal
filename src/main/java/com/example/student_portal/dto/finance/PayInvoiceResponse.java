@@ -2,7 +2,13 @@ package com.example.student_portal.dto.finance;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.*;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PayInvoiceResponse {
     private Long id;
     private String studentId;

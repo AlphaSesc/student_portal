@@ -53,9 +53,9 @@ public class WebPageController {
     public String graduationPage() {
         return "student/graduation-eligibility";
     }
-//
-//    @GetMapping("/invoices")
-//    public String invoicesPage() {
-//        return "student/invoices";
-//    }
+
+    @GetMapping("/my-invoices")
+    public String myInvoices() {
+        return "student/my-invoices";
+    }
 }

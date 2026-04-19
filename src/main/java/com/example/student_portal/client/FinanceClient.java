@@ -4,6 +4,9 @@ import com.example.student_portal.dto.finance.*;
 import com.example.student_portal.exception.ExternalServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -54,11 +57,17 @@ public class FinanceClient {
 
     public PayInvoiceResponse payInvoice(PayInvoiceRequest request) {
         try {
-            return restTemplate.postForObject(
+            HttpEntity<PayInvoiceRequest> entity = new HttpEntity<>(request);
+
+            ResponseEntity<PayInvoiceResponse> response = restTemplate.exchange(
                     financeBaseUrl + "/api/invoices/pay",
-                    request,
+                    HttpMethod.PUT,
+                    entity,
                     PayInvoiceResponse.class
             );
+
+            return response.getBody();
+
         } catch (RestClientException ex) {
             throw new ExternalServiceException("Failed to pay invoice in finance service");
         }
