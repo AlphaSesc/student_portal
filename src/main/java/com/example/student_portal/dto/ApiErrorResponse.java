@@ -1,12 +1,14 @@
 package com.example.student_portal.dto;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class ApiErrorResponse {
     private LocalDateTime timestamp;

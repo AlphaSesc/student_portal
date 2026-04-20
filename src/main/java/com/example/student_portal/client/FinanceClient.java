@@ -1,5 +1,6 @@
 package com.example.student_portal.client;
 
+import com.example.student_portal.dto.ApiErrorResponse;
 import com.example.student_portal.dto.finance.*;
 import com.example.student_portal.exception.ExternalServiceException;
 import lombok.RequiredArgsConstructor;
@@ -8,8 +9,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +30,11 @@ public class FinanceClient {
                     request,
                     Void.class
             );
-        } catch (RestClientException ex) {
+        } catch (HttpStatusCodeException ex) {
+            throw new ExternalServiceException(extractErrorMessage(ex));
+        }
+
+        catch (RestClientException ex) {
             throw new ExternalServiceException("Failed to create finance account");
         }
     }
@@ -39,7 +46,11 @@ public class FinanceClient {
                     request,
                     Void.class
             );
-        } catch (RestClientException ex) {
+        } catch (HttpStatusCodeException ex) {
+            throw new ExternalServiceException(extractErrorMessage(ex));
+        }
+
+        catch (RestClientException ex) {
             throw new ExternalServiceException("Failed to create invoice in finance service");
         }
     }
@@ -50,7 +61,11 @@ public class FinanceClient {
                     financeBaseUrl + "/api/invoices/outstanding/" + studentId,
                     OutstandingBalanceResponse.class
             );
-        } catch (RestClientException ex) {
+        }  catch (HttpStatusCodeException ex) {
+            throw new ExternalServiceException(extractErrorMessage(ex));
+        }
+
+        catch (RestClientException ex) {
             throw new ExternalServiceException("Failed to check outstanding balance from finance service");
         }
     }
@@ -68,7 +83,10 @@ public class FinanceClient {
 
             return response.getBody();
 
-        } catch (RestClientException ex) {
+        } catch (HttpStatusCodeException ex) {
+            throw new ExternalServiceException(extractErrorMessage(ex));
+        }
+        catch (RestClientException ex) {
             throw new ExternalServiceException("Failed to pay invoice in finance service");
         }
     }
@@ -79,8 +97,28 @@ public class FinanceClient {
                     financeBaseUrl + "/api/invoices/student/" + studentId,
                     PayInvoiceResponse[].class
             );
-        } catch (RestClientException ex) {
+        } catch (HttpStatusCodeException ex) {
+            throw new ExternalServiceException(extractErrorMessage(ex));
+        }
+        catch (RestClientException ex) {
             throw new ExternalServiceException("Failed to fetch invoices from finance service");
         }
+    }
+
+    private String extractErrorMessage(HttpStatusCodeException ex) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ApiErrorResponse errorResponse = objectMapper.readValue(
+                    ex.getResponseBodyAsString(),
+                    ApiErrorResponse.class
+            );
+
+            if (errorResponse.getMessage() != null && !errorResponse.getMessage().isBlank()) {
+                return errorResponse.getMessage();
+            }
+        } catch (Exception ignored) {
+        }
+
+        return "Finance service request failed";
     }
 }
