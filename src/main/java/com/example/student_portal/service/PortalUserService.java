@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+// Service responsible for user registration and authentication logic
 public class PortalUserService {
 
     private final PortalUserRepository portalUserRepository;
@@ -21,22 +22,29 @@ public class PortalUserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // Registers a new user after validating uniqueness and encoding password
     public PortalUser registerUser(PortalUser user) {
         if (portalUserRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new ResourceAlreadyExistsException("Email already registered");
         }
+        // Encode password before storing for security
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return portalUserRepository.save(user);
     }
 
+    // Retrieves user by email (used internally or during authentication)
     public Optional<PortalUser> findByUsername(String email) {
         return portalUserRepository.findByEmail(email);
     }
 
+    // Authenticates user by verifying email and password
     public PortalUser authenticate(String email, String password) {
+
+        // Fetch user from database
         PortalUser user = portalUserRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
+        // Validate raw password against encoded password
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new InvalidCredentialsException("Invalid password");
         }

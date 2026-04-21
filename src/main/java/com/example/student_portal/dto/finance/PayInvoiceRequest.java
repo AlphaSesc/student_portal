@@ -7,6 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// Request DTO used to communicate with Finance service to process invoice payment using studentId and reference
 public class PayInvoiceRequest {
 
     private String studentId;

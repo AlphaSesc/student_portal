@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// Response DTO received from Finance service after successful invoice payment, containing updated invoice details
 public class PayInvoiceResponse {
     private Long id;
     private String studentId;

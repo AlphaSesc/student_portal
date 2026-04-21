@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// Request DTO used to communicate with Finance service for invoice creation (e.g., enrollment or fine)
 public class CreateInvoiceRequest {
     private String studentId;
     private String courseCode;

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+// Service responsible for student profile management and graduation eligibility checks
 public class StudentService {
 
     private final StudentRepository studentRepository;
@@ -26,6 +27,7 @@ public class StudentService {
     private final AuthenticatedUserService authenticatedUserService;
     private final FinanceClient financeClient;
 
+    // Retrieves profile of the currently authenticated student
     public StudentProfileResponse getMyProfile() {
         PortalUser portalUser = authenticatedUserService.getCurrentStudentUser();
 
@@ -35,6 +37,7 @@ public class StudentService {
         return mapToProfileResponse(student, portalUser);
     }
 
+    // Updates editable fields of the current student's profile
     public StudentProfileResponse updateMyProfile(UpdateStudentProfileRequest request) {
         PortalUser portalUser = authenticatedUserService.getCurrentStudentUser();
 
@@ -51,6 +54,7 @@ public class StudentService {
         return mapToProfileResponse(updatedStudent, portalUser);
     }
 
+    // Maps Student entity and PortalUser email into a profile response DTO
     private StudentProfileResponse mapToProfileResponse(Student student, PortalUser portalUser) {
         return StudentProfileResponse.builder()
                 .studentId(student.getStudentId())
@@ -62,12 +66,14 @@ public class StudentService {
                 .build();
     }
 
+    // Checks graduation eligibility by verifying outstanding balance from Finance service
     public GraduationEligibilityResponse checkGraduationEligibility() {
         PortalUser portalUser = authenticatedUserService.getCurrentStudentUser();
 
         Student student = studentRepository.findByPortalUser(portalUser)
                 .orElseThrow(() -> new ResourceNotFoundException("Student profile not found"));
 
+        // External service call to verify unpaid invoices
         var balanceResponse = financeClient.checkOutstandingBalance(student.getStudentId());
 
         boolean eligible = !balanceResponse.isHasOutstandingBalance();

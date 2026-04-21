@@ -5,6 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "students")
+// Represents student profile information linked to a portal user account
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,6 +18,7 @@ public class Student {
     private Long id;
 
     @Column(name = "student_id", nullable = false, unique = true)
+    // Unique identifier used across microservices (e.g., Finance, Library)
     private String studentId;
 
     private String firstName;
@@ -30,5 +32,8 @@ public class Student {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "portal_user_id", nullable = false, unique = true)
+    // Establishes a one-to-one relationship with PortalUser for authentication.
+    // Each student profile is linked to exactly one user account.
+    // LAZY loading is used to avoid fetching authentication data unless required.
     private PortalUser portalUser;
 }

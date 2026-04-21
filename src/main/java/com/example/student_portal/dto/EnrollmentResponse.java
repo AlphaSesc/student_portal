@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// Response DTO representing enrollment details for a student
 public class EnrollmentResponse {
 
     private Long enrollmentId;

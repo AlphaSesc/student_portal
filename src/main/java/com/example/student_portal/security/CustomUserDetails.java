@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
+// Custom implementation of UserDetails to integrate PortalUser with Spring Security
 public class CustomUserDetails implements UserDetails {
 
     private final Long id;
@@ -17,6 +18,7 @@ public class CustomUserDetails implements UserDetails {
     private final String password;
     private final String role;
 
+    // Maps PortalUser entity to Spring Security user details
     public CustomUserDetails(PortalUser user) {
         this.id = user.getId();
         this.email = user.getEmail();
@@ -25,11 +27,13 @@ public class CustomUserDetails implements UserDetails {
     }
 
     @Override
+    // Converts user role into Spring Security authority format (e.g., ROLE_ADMIN)
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
     @Override
+    // Uses email as the username for authentication
     public String getUsername() {
         return email;
     }

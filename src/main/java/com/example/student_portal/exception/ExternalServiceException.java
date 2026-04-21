@@ -2,6 +2,7 @@ package com.example.student_portal.exception;
 
 import org.springframework.http.HttpStatus;
 
+// Thrown when an external microservice (e.g., Finance or Library) fails or is unavailable (HTTP 502)
 public class ExternalServiceException extends BusinessException {
 
     public ExternalServiceException(String message) {

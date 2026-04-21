@@ -7,6 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// Response DTO indicating whether a student meets graduation requirements
 public class GraduationEligibilityResponse {
     private String studentId;
     private boolean eligible;

@@ -14,12 +14,15 @@ public class RegisterRequest {
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email format is invalid")
+    // Validates that email is provided and follows proper format
     private String email;
 
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters")
+    // Enforces minimum password length for basic security
     private String password;
 
     @NotNull(message = "Role is required")
+    // Specifies user role for role-based access control
     private UserRole role;
 }

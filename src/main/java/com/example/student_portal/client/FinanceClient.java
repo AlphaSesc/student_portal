@@ -16,13 +16,16 @@ import tools.jackson.databind.ObjectMapper;
 
 @Component
 @RequiredArgsConstructor
+// Client responsible for communicating with Finance microservice
 public class FinanceClient {
 
     private final RestTemplate restTemplate;
 
     @Value("${finance.service.base-url}")
+    // Base URL of Finance service (configured externally)
     private String financeBaseUrl;
 
+    // Creates finance account when a new student registers or when student Enrolls
     public void createAccount(CreateFinanceAccountRequest request) {
         try {
             restTemplate.postForObject(
@@ -31,6 +34,7 @@ public class FinanceClient {
                     Void.class
             );
         } catch (HttpStatusCodeException ex) {
+            // Extract meaningful error from finance service response
             throw new ExternalServiceException(extractErrorMessage(ex));
         }
 
@@ -39,6 +43,7 @@ public class FinanceClient {
         }
     }
 
+    // Generates invoice (e.g., course enrollment or fine)
     public void createInvoice(CreateInvoiceRequest request) {
         try {
             restTemplate.postForObject(
@@ -55,6 +60,7 @@ public class FinanceClient {
         }
     }
 
+    // Checks if student has unpaid invoices (used for eligibility logic)
     public OutstandingBalanceResponse checkOutstandingBalance(String studentId) {
         try {
             return restTemplate.getForObject(
@@ -70,6 +76,7 @@ public class FinanceClient {
         }
     }
 
+    // Sends payment request to finance service
     public PayInvoiceResponse payInvoice(PayInvoiceRequest request) {
         try {
             HttpEntity<PayInvoiceRequest> entity = new HttpEntity<>(request);
@@ -91,6 +98,7 @@ public class FinanceClient {
         }
     }
 
+    // Retrieves all invoices for a student (used for invoice history UI)
     public PayInvoiceResponse[] getInvoicesByStudentId(String studentId) {
         try {
             return restTemplate.getForObject(
@@ -105,6 +113,7 @@ public class FinanceClient {
         }
     }
 
+    // Extracts structured error message from Finance service response
     private String extractErrorMessage(HttpStatusCodeException ex) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();

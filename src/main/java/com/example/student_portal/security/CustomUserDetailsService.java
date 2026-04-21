@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 @Service
+// Service used by Spring Security to load user details during authentication
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final PortalUserRepository portalUserRepository;
@@ -17,6 +18,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
+    // Fetches user by email and throws exception if not found
     public UserDetails loadUserByUsername(String email) {
         PortalUser user = portalUserRepository.findByEmail(email)
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));

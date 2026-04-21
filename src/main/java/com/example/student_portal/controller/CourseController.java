@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/courses")
+// REST controller for managing course-related operations
 public class CourseController {
 
     private final CourseService courseService;
@@ -17,25 +18,25 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-    // GET /api/courses
+    // Retrieves all available courses
     @GetMapping
     public ResponseEntity<List<Course>> getAllCourses() {
         return ResponseEntity.ok(courseService.getAllCourses());
     }
 
-    // GET /api/courses/{id}
+    // Retrieves a specific course by ID
     @GetMapping("/{id}")
     public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
         return ResponseEntity.ok(courseService.getCourseById(id));
     }
 
-    // POST /api/courses
+    // Creates a new course (typically admin operation)
     @PostMapping
     public ResponseEntity<Course> createCourse(@RequestBody Course course) {
         return ResponseEntity.ok(courseService.createCourse(course));
     }
 
-    // PUT /api/courses/{id}
+    // Updates an existing course
     @PutMapping("/{id}")
     public ResponseEntity<Course> updateCourse(
             @PathVariable Long id,
@@ -44,7 +45,7 @@ public class CourseController {
         return ResponseEntity.ok(courseService.updateCourse(id, course));
     }
 
-    // DELETE /api/courses/{id}
+    // Deletes a course by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
         courseService.deleteCourse(id);

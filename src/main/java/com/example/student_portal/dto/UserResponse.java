@@ -6,8 +6,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+// Response DTO exposing user details for client-side use without sensitive data
 public class UserResponse {
     private Long id;
     private String email;
+    // Indicates user role for role-based access control on client side
     private UserRole role;
 }

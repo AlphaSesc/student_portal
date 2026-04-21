@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// Request DTO used to communicate with Library service for creating a student library account
 public class CreateLibraryAccountRequest {
     private String studentId;
 }

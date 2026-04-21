@@ -1,17 +1,22 @@
 server:
+  # Port on which Student Portal service runs
   port: 8081
 
 spring:
   application:
+    # Service name used in microservice architecture
     name: student-portal-service
 
   profiles:
+    # Active profile (e.g., dev, prod)
     active: dev
 
 finance:
   service:
+    # Base URL of Finance microservice for inter-service communication
     base-url: http://localhost:8080
 
 library:
   service:
+    # Base URL of Library microservice for inter-service communication
     base-url: http://localhost:8082

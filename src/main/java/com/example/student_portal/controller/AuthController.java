@@ -2,7 +2,6 @@ package com.example.student_portal.controller;
 
 import com.example.student_portal.dto.AuthResponse;
 import com.example.student_portal.dto.LoginRequest;
-//import com.example.student_portal.dto.LoginResponse;
 import com.example.student_portal.dto.RegisterRequest;
 import com.example.student_portal.dto.UserResponse;
 import com.example.student_portal.entity.PortalUser;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
+// REST controller exposing authentication-related endpoints such as registration and login
 public class AuthController {
 
     private final PortalUserService portalUserService;
@@ -26,6 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    // Registers a new portal user and returns non-sensitive user details
     public UserResponse register(@Valid @RequestBody RegisterRequest request) {
         System.out.println("Register endpoint hit");
         PortalUser user = PortalUser.builder()
@@ -42,12 +43,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    // Authenticates user credentials and returns JWT token for future secured requests
     public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         PortalUser user = portalUserService.authenticate(
                 request.getEmail(),
                 request.getPassword()
         );
 
+        // Generate JWT token after successful authentication
         String token = jwtService.generateToken(new CustomUserDetails(user));
 
         return new AuthResponse(

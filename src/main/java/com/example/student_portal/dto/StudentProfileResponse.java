@@ -7,6 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// Response DTO representing student profile information for client display
 public class StudentProfileResponse {
 
     private String studentId;
