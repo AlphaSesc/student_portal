@@ -1,0 +1,30 @@
+spring:
+
+  security:
+    user:
+      # Default in-memory admin credentials for basic access/testing
+      name: admin
+      password: admin123
+  datasource:
+    # MySQL database configuration for Student Portal service
+    url: jdbc:mysql://localhost:3306/student_portal
+    username: your username
+    password: your password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      # Automatically updates schema during development
+      ddl-auto: update
+      # Logs generated SQL queries for debugging
+    show-sql: true
+    properties:
+      hibernate:
+        # Formats SQL output for better readability
+        format_sql: true
+
+jwt:
+  # Secret key used to sign and verify JWT tokens
+  secret: your secret key
+  # Token validity duration in milliseconds (24 hours)
+  expiration: 86400000

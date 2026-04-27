@@ -26,7 +26,7 @@ public class LibraryClient {
     public void registerStudent(CreateLibraryAccountRequest request) {
         try {
             restTemplate.postForObject(
-                    libraryBaseUrl + "/api/register",
+                    libraryBaseUrl + "/api/library/register",
                     request,
                     Void.class
             );
