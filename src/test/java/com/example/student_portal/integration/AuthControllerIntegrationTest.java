@@ -30,36 +30,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 // Integration test for AuthController covering registration and login endpoints
 class AuthControllerIntegrationTest {
 
-    // -------------------------------------------------------------------------
+    
     // Testcontainers: starts a real MySQL container once for all tests
-    // -------------------------------------------------------------------------
+    
     @Container
     @ServiceConnection
     static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.0");
 
-    // -------------------------------------------------------------------------
+    
     // Random port assigned to embedded server - needed to build full request URLs
-    // -------------------------------------------------------------------------
+    
     @LocalServerPort
     private int port;
 
-    // -------------------------------------------------------------------------
+    
     // Spring-managed dependencies for verification and seeding test data
-    // -------------------------------------------------------------------------
+    
     @Autowired
     private PortalUserRepository portalUserRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // -------------------------------------------------------------------------
+    
     // HTTP client for calling REST APIs
-    // -------------------------------------------------------------------------
+    
     private RestClient restClient;
 
-    // =========================================================================
+    
     // Setup & Teardown
-    // =========================================================================
+    
 
     @BeforeEach
     void setUp() {
@@ -78,9 +78,9 @@ class AuthControllerIntegrationTest {
         portalUserRepository.deleteAll();
     }
 
-    // =========================================================================
+    
     // Test 1 – POST /api/auth/register  →  successfully registers a new user
-    // =========================================================================
+    
     @Test
     void shouldRegisterNewUser() {
         // Given – a valid registration payload
@@ -111,9 +111,9 @@ class AuthControllerIntegrationTest {
         assertThat(passwordEncoder.matches("password123", saved.getPassword())).isTrue();
     }
 
-    // =========================================================================
+    
     // Test 2 – POST /api/auth/register  →  fails when email already exists
-    // =========================================================================
+    
     @Test
     void shouldFailRegistrationWhenEmailAlreadyExists() {
         // Given – an existing user with the same email
@@ -143,9 +143,9 @@ class AuthControllerIntegrationTest {
                 || response.getStatusCode().is5xxServerError()).isTrue();
     }
 
-    // =========================================================================
+    
     // Test 3 – POST /api/auth/login  →  successfully logs in with valid credentials
-    // =========================================================================
+    
     @Test
     void shouldLoginSuccessfullyWithValidCredentials() {
         // Given – an existing user in the database
@@ -180,9 +180,9 @@ class AuthControllerIntegrationTest {
         assertThat(response.getBody().getToken().split("\\.")).hasSize(3);
     }
 
-    // =========================================================================
+    
     // Test 4 – POST /api/auth/login  →  fails with wrong password
-    // =========================================================================
+    
     @Test
     void shouldFailLoginWithWrongPassword() {
         // Given – an existing user
@@ -211,9 +211,9 @@ class AuthControllerIntegrationTest {
                 || response.getStatusCode().is5xxServerError()).isTrue();
     }
 
-    // =========================================================================
+    
     // Test 5 – POST /api/auth/login  →  fails when user does not exist
-    // =========================================================================
+    
     @Test
     void shouldFailLoginWhenUserDoesNotExist() {
         // Given – no user with this email exists in the database
@@ -236,9 +236,9 @@ class AuthControllerIntegrationTest {
                 || response.getStatusCode().is5xxServerError()).isTrue();
     }
 
-    // =========================================================================
+    
     // Test 6 – Full flow: register a user, then log in with the same credentials
-    // =========================================================================
+    
     @Test
     void shouldRegisterAndThenLoginSuccessfully() {
         // ---- Step 1: Register ----
@@ -278,10 +278,10 @@ class AuthControllerIntegrationTest {
         assertThat(loginResponse.getBody().getRole()).isEqualTo(UserRole.STUDENT);
     }
 
-    // =========================================================================
+    
     // Test 7 – POST /api/auth/register  →  fails with invalid email format
     //          (relies on @Valid + Bean Validation in RegisterRequest DTO)
-    // =========================================================================
+    
     @Test
     void shouldFailRegistrationWithInvalidEmailFormat() {
         // Given – payload with malformed email

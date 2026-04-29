@@ -34,23 +34,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 // Full integration test for CourseController using a real MySQL container and JWT authentication
 class CourseControllerIntegrationTest {
 
-    // -------------------------------------------------------------------------
+    
     // Testcontainers: starts a real MySQL container once for all tests
     // Using mysql:8.0 to avoid breaking changes introduced in MySQL 9.x
-    // -------------------------------------------------------------------------
+    
     @Container
     @ServiceConnection
     static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.0");
 
-    // -------------------------------------------------------------------------
+    
     // Random port assigned to embedded server - needed to build full request URLs
-    // -------------------------------------------------------------------------
+    
     @LocalServerPort
     private int port;
 
-    // -------------------------------------------------------------------------
+    
     // Spring-managed dependencies injected for test setup
-    // -------------------------------------------------------------------------
+    
     @Autowired
     private CourseRepository courseRepository;
 
@@ -63,17 +63,17 @@ class CourseControllerIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // -------------------------------------------------------------------------
+    
     // Shared test state
-    // -------------------------------------------------------------------------
+    
     private Course course;
     private String studentToken;   // JWT for a STUDENT user
     private String adminToken;     // JWT for an ADMIN user
     private RestClient restClient; // HTTP client used to call REST APIs
 
-    // =========================================================================
+    
     // Setup & Teardown
-    // =========================================================================
+    
 
     @BeforeEach
     void setUp() {
@@ -117,9 +117,9 @@ class CourseControllerIntegrationTest {
         portalUserRepository.deleteAll();
     }
 
-    // =========================================================================
+    
     // Test 1 – GET /api/courses  →  returns all courses
-    // =========================================================================
+    
     @Test
     void shouldGetAllCourses() {
         // Given – one course saved in the database
@@ -139,9 +139,9 @@ class CourseControllerIntegrationTest {
         assertThat(response.getBody()[0].getCourseCode()).isEqualTo("CS101");
     }
 
-    // =========================================================================
+    
     // Test 2 – GET /api/courses/{id}  →  returns course by ID
-    // =========================================================================
+    
     @Test
     void shouldGetCourseById() {
         // Given – course saved; its generated ID is used for lookup
@@ -162,9 +162,9 @@ class CourseControllerIntegrationTest {
         assertThat(response.getBody().getFee()).isEqualByComparingTo("1500.00");
     }
 
-    // =========================================================================
+    
     // Test 3 – POST /api/courses  →  creates a new course
-    // =========================================================================
+    
     @Test
     void shouldCreateCourse() {
         // When – authenticated user sends POST request with course body
@@ -187,9 +187,9 @@ class CourseControllerIntegrationTest {
         assertThat(courseRepository.findByCourseCode("CS101")).isPresent();
     }
 
-    // =========================================================================
+    
     // Test 4 – PUT /api/courses/{id}  →  updates an existing course
-    // =========================================================================
+    
     @Test
     void shouldUpdateCourse() {
         // Given – course already saved in the database
@@ -219,9 +219,9 @@ class CourseControllerIntegrationTest {
         assertThat(response.getBody().getFee()).isEqualByComparingTo("2000.00");
     }
 
-    // =========================================================================
+    
     // Test 5 – DELETE /api/courses/{id}  →  deletes a course
-    // =========================================================================
+    
     @Test
     void shouldDeleteCourse() {
         // Given – course already saved in the database
@@ -239,9 +239,9 @@ class CourseControllerIntegrationTest {
         assertThat(courseRepository.findById(saved.getId())).isEmpty();
     }
 
-    // =========================================================================
+    
     // Test 6 – GET /api/courses  →  returns 401 without token
-    // =========================================================================
+    
     @Test
     void shouldReturn401WhenNoTokenProvided() {
         // When – unauthenticated request is sent (no Authorization header)
@@ -254,9 +254,9 @@ class CourseControllerIntegrationTest {
         assertThat(response.getStatusCode().value()).isEqualTo(401);
     }
 
-    // =========================================================================
+    
     // Test 7 – GET /api/courses  →  returns 401 with invalid token
-    // =========================================================================
+    
     @Test
     void shouldReturn401WhenInvalidTokenProvided() {
         // When – request is sent with a malformed/invalid JWT token
@@ -270,9 +270,9 @@ class CourseControllerIntegrationTest {
         assertThat(response.getStatusCode().value()).isEqualTo(401);
     }
 
-    // =========================================================================
+    
     // Test 8 – GET /api/courses/{id}  →  returns error for non-existent ID
-    // =========================================================================
+    
     @Test
     void shouldReturnErrorWhenCourseNotFound() {
         // When – authenticated student requests a non-existent course
@@ -282,7 +282,7 @@ class CourseControllerIntegrationTest {
                 .retrieve()
                 .toEntity(String.class);
 
-        // Then – service throws ResourceNotFoundException (mapped to 4xx/5xx by your exception handler)
+        // Then – service throws ResourceNotFoundException (mapped to 4xx/5xx by exception handler)
         HttpStatusCode status = response.getStatusCode();
         assertThat(status.is4xxClientError() || status.is5xxServerError()).isTrue();
     }

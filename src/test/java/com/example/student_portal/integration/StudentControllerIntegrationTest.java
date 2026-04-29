@@ -44,11 +44,11 @@ import static org.mockito.Mockito.*;
 // are not running during tests - we only test the student-portal application logic.
 class StudentControllerIntegrationTest {
 
-    // -------------------------------------------------------------------------
+    
     // Mock external service clients so the test doesn't try to reach real
     // Finance/Library microservices over HTTP. @Primary ensures these mocks
     // override the real beans during this test.
-    // -------------------------------------------------------------------------
+    
     @TestConfiguration
     static class MockedExternalClientsConfig {
         @Bean
@@ -64,22 +64,22 @@ class StudentControllerIntegrationTest {
         }
     }
 
-    // -------------------------------------------------------------------------
+    
     // Testcontainers: real MySQL container as backend database
-    // -------------------------------------------------------------------------
+    
     @Container
     @ServiceConnection
     static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.0");
 
-    // -------------------------------------------------------------------------
+    
     // Random port assigned to embedded server
-    // -------------------------------------------------------------------------
+    
     @LocalServerPort
     private int port;
 
-    // -------------------------------------------------------------------------
+    
     // Spring-managed dependencies
-    // -------------------------------------------------------------------------
+    
     @Autowired
     private PortalUserRepository portalUserRepository;
 
@@ -98,18 +98,18 @@ class StudentControllerIntegrationTest {
     @Autowired
     private LibraryClient libraryClient;   // mock injected from TestConfiguration
 
-    // -------------------------------------------------------------------------
+    
     // Shared test state
-    // -------------------------------------------------------------------------
+    
     private RestClient restClient;
     private String studentToken;
     private String adminToken;
     private PortalUser studentUser;
     private Student student;
 
-    // =========================================================================
+    
     // Setup & Teardown
-    // =========================================================================
+    
 
     @BeforeEach
     void setUp() {
@@ -159,9 +159,9 @@ class StudentControllerIntegrationTest {
         portalUserRepository.deleteAll();
     }
 
-    // =========================================================================
+    
     // Test 1 – GET /api/students/me  →  returns current student's profile
-    // =========================================================================
+    
     @Test
     void shouldGetCurrentStudentProfile() {
         // When – authenticated student requests their profile
@@ -182,9 +182,9 @@ class StudentControllerIntegrationTest {
         assertThat(response.getBody().getEmail()).isEqualTo("student@test.com");
     }
 
-    // =========================================================================
+    
     // Test 2 – GET /api/students/me  →  fails when student profile missing
-    // =========================================================================
+    
     @Test
     void shouldFailGetProfileWhenStudentNotFound() {
         // Given – delete the student profile (only PortalUser remains)
@@ -202,9 +202,9 @@ class StudentControllerIntegrationTest {
                 || response.getStatusCode().is5xxServerError()).isTrue();
     }
 
-    // =========================================================================
+    
     // Test 3 – PUT /api/students/me  →  updates profile fields
-    // =========================================================================
+    
     @Test
     void shouldUpdateCurrentStudentProfile() {
         // Given – payload with new profile values
@@ -239,10 +239,10 @@ class StudentControllerIntegrationTest {
         assertThat(updated.getAddress()).isEqualTo("456 New Avenue");
     }
 
-    // =========================================================================
+    
     // Test 4 – PUT /api/students/me  →  fails when phone format is invalid
     //          (Bean Validation @Pattern on phone field)
-    // =========================================================================
+    
     @Test
     void shouldFailProfileUpdateWhenPhoneInvalid() {
         // Given – payload with invalid phone (non-numeric)
@@ -265,10 +265,10 @@ class StudentControllerIntegrationTest {
         assertThat(response.getStatusCode().is4xxClientError()).isTrue();
     }
 
-    // =========================================================================
+    
     // Test 5 – PUT /api/students/me  →  fails when first name too short
     //          (Bean Validation @Size on firstName field)
-    // =========================================================================
+    
     @Test
     void shouldFailProfileUpdateWhenFirstNameTooShort() {
         // Given – payload with first name shorter than 2 chars
@@ -291,9 +291,9 @@ class StudentControllerIntegrationTest {
         assertThat(response.getStatusCode().is4xxClientError()).isTrue();
     }
 
-    // =========================================================================
+    
     // Test 6 – GET /api/students/me/graduation-eligibility  →  eligible (no balance)
-    // =========================================================================
+    
     @Test
     void shouldReturnEligibleWhenNoOutstandingBalance() {
         // Given – Finance service mock returns no outstanding balance
@@ -320,9 +320,9 @@ class StudentControllerIntegrationTest {
         verify(financeClient, times(1)).checkOutstandingBalance("STU-TEST-001");
     }
 
-    // =========================================================================
+    
     // Test 7 – GET /api/students/me/graduation-eligibility  →  NOT eligible
-    // =========================================================================
+    
     @Test
     void shouldReturnNotEligibleWhenOutstandingBalanceExists() {
         // Given – Finance service mock returns outstanding balance
@@ -348,9 +348,9 @@ class StudentControllerIntegrationTest {
         verify(financeClient, times(1)).checkOutstandingBalance("STU-TEST-001");
     }
 
-    // =========================================================================
+    
     // Test 8 – Endpoints reject ADMIN role (only STUDENT can access these)
-    // =========================================================================
+    
     @Test
     void shouldRejectAdminFromAccessingStudentEndpoints() {
         // When – ADMIN user tries to access /me profile endpoint
@@ -365,9 +365,9 @@ class StudentControllerIntegrationTest {
                 || response.getStatusCode().is5xxServerError()).isTrue();
     }
 
-    // =========================================================================
+    
     // Test 9 – Endpoints require authentication
-    // =========================================================================
+    
     @Test
     void shouldReturn401WhenNoTokenProvided() {
         // When – unauthenticated GET is sent

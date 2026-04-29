@@ -48,11 +48,11 @@ import static org.mockito.Mockito.*;
 // are not running during tests - we only test the student-portal application logic.
 class FinanceControllerIntegrationTest {
 
-    // -------------------------------------------------------------------------
+    
     // Mock external service clients so the test doesn't try to reach real
     // Finance/Library microservices over HTTP. @Primary ensures these mocks
     // override the real beans during this test.
-    // -------------------------------------------------------------------------
+    
     @TestConfiguration
     static class MockedExternalClientsConfig {
         @Bean
@@ -68,22 +68,22 @@ class FinanceControllerIntegrationTest {
         }
     }
 
-    // -------------------------------------------------------------------------
+    
     // Testcontainers: real MySQL container as backend database
-    // -------------------------------------------------------------------------
+    
     @Container
     @ServiceConnection
     static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.0");
 
-    // -------------------------------------------------------------------------
+    
     // Random port assigned to embedded server
-    // -------------------------------------------------------------------------
+    
     @LocalServerPort
     private int port;
 
-    // -------------------------------------------------------------------------
+    
     // Spring-managed dependencies
-    // -------------------------------------------------------------------------
+    
     @Autowired
     private PortalUserRepository portalUserRepository;
 
@@ -102,18 +102,18 @@ class FinanceControllerIntegrationTest {
     @Autowired
     private LibraryClient libraryClient;   // mock injected from TestConfiguration
 
-    // -------------------------------------------------------------------------
+    
     // Shared test state
-    // -------------------------------------------------------------------------
+    
     private RestClient restClient;
     private String studentToken;
     private String adminToken;
     private PortalUser studentUser;
     private Student student;
 
-    // =========================================================================
+    
     // Setup & Teardown
-    // =========================================================================
+    
 
     @BeforeEach
     void setUp() {
@@ -161,9 +161,9 @@ class FinanceControllerIntegrationTest {
         portalUserRepository.deleteAll();
     }
 
-    // =========================================================================
+    
     // Helper: builds a sample PayInvoiceResponse to be returned from mock
-    // =========================================================================
+    
     private PayInvoiceResponse sampleInvoice(String reference) {
         return PayInvoiceResponse.builder()
                 .id(1L)
@@ -176,9 +176,9 @@ class FinanceControllerIntegrationTest {
                 .build();
     }
 
-    // =========================================================================
+    
     // Test 1 – POST /api/finance/pay  →  successfully pays an invoice
-    // =========================================================================
+    
     @Test
     void shouldPayInvoiceSuccessfully() {
         // Given – Finance service mock returns a paid invoice response
@@ -214,9 +214,9 @@ class FinanceControllerIntegrationTest {
         assertThat(sent.getReference()).isEqualTo("INV-12345");
     }
 
-    // =========================================================================
+    
     // Test 2 – POST /api/finance/pay  →  fails when student profile missing
-    // =========================================================================
+    
     @Test
     void shouldFailPaymentWhenStudentProfileNotFound() {
         // Given – delete the student profile (only PortalUser remains)
@@ -242,9 +242,9 @@ class FinanceControllerIntegrationTest {
         verify(financeClient, never()).payInvoice(any());
     }
 
-    // =========================================================================
+    
     // Test 3 – POST /api/finance/pay  →  fails when ADMIN tries to pay
-    // =========================================================================
+    
     @Test
     void shouldRejectAdminFromPayingInvoice() {
         // Given – ADMIN user attempting payment
@@ -268,9 +268,9 @@ class FinanceControllerIntegrationTest {
         verify(financeClient, never()).payInvoice(any());
     }
 
-    // =========================================================================
+    
     // Test 4 – GET /api/finance/my-invoices  →  returns student's invoice list
-    // =========================================================================
+    
     @Test
     void shouldGetMyInvoicesSuccessfully() {
         // Given – Finance service mock returns multiple invoices
@@ -298,10 +298,10 @@ class FinanceControllerIntegrationTest {
         verify(financeClient, times(1)).getInvoicesByStudentId("STU-TEST-001");
     }
 
-    // =========================================================================
+    
     // Test 5 – GET /api/finance/my-invoices  →  returns empty list safely
     //          (FinanceService converts null/empty array to empty List)
-    // =========================================================================
+    
     @Test
     void shouldReturnEmptyListWhenNoInvoicesExist() {
         // Given – Finance service mock returns null (no invoices)
@@ -319,9 +319,9 @@ class FinanceControllerIntegrationTest {
         assertThat(response.getBody()).isNotNull().isEmpty();
     }
 
-    // =========================================================================
+    
     // Test 6 – GET /api/finance/my-invoices  →  fails when student profile missing
-    // =========================================================================
+    
     @Test
     void shouldFailGetInvoicesWhenStudentProfileNotFound() {
         // Given – delete the student profile
@@ -342,9 +342,9 @@ class FinanceControllerIntegrationTest {
         verify(financeClient, never()).getInvoicesByStudentId(anyString());
     }
 
-    // =========================================================================
+    
     // Test 7 – GET /api/finance/my-invoices  →  rejects ADMIN role
-    // =========================================================================
+    
     @Test
     void shouldRejectAdminFromGettingInvoices() {
         // When – ADMIN tries to access student's invoice history
@@ -362,9 +362,9 @@ class FinanceControllerIntegrationTest {
         verify(financeClient, never()).getInvoicesByStudentId(anyString());
     }
 
-    // =========================================================================
+    
     // Test 8 – Endpoints require authentication
-    // =========================================================================
+    
     @Test
     void shouldReturn401WhenNoTokenProvidedOnGetInvoices() {
         // When – unauthenticated GET is sent

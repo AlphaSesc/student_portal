@@ -46,11 +46,11 @@ import static org.mockito.Mockito.*;
 // are not running during tests - we only test the student-portal application logic.
 class EnrollmentControllerIntegrationTest {
 
-    // -------------------------------------------------------------------------
+    
     // Mock external service clients so the test doesn't try to reach real
     // Finance/Library microservices over HTTP. @Primary ensures these mocks
     // override the real beans during this test.
-    // -------------------------------------------------------------------------
+    
     @TestConfiguration
     static class MockedExternalClientsConfig {
         @Bean
@@ -66,22 +66,22 @@ class EnrollmentControllerIntegrationTest {
         }
     }
 
-    // -------------------------------------------------------------------------
+    
     // Testcontainers: real MySQL container as backend database
-    // -------------------------------------------------------------------------
+    
     @Container
     @ServiceConnection
     static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.0");
 
-    // -------------------------------------------------------------------------
+    
     // Random port assigned to embedded server
-    // -------------------------------------------------------------------------
+    
     @LocalServerPort
     private int port;
 
-    // -------------------------------------------------------------------------
+    
     // Spring-managed dependencies
-    // -------------------------------------------------------------------------
+    
     @Autowired
     private CourseRepository courseRepository;
 
@@ -106,18 +106,18 @@ class EnrollmentControllerIntegrationTest {
     @Autowired
     private LibraryClient libraryClient;   // mock injected from TestConfiguration
 
-    // -------------------------------------------------------------------------
+    
     // Shared test state
-    // -------------------------------------------------------------------------
+    
     private RestClient restClient;
     private String studentToken;
     private String adminToken;
     private PortalUser studentUser;
     private Course course;
 
-    // =========================================================================
+    
     // Setup & Teardown
-    // =========================================================================
+    
 
     @BeforeEach
     void setUp() {
@@ -167,10 +167,10 @@ class EnrollmentControllerIntegrationTest {
         portalUserRepository.deleteAll();
     }
 
-    // =========================================================================
+    
     // Test 1 – POST /api/enrollments  →  successfully enrolls a student
     //          (also creates a Student profile and calls finance + library)
-    // =========================================================================
+    
     @Test
     void shouldEnrollStudentSuccessfully() {
         // Given – payload with the persisted course id
@@ -208,9 +208,9 @@ class EnrollmentControllerIntegrationTest {
         verify(financeClient, times(1)).createInvoice(any());   // for the enrollment
     }
 
-    // =========================================================================
+    
     // Test 2 – POST /api/enrollments  →  fails when course doesn't exist
-    // =========================================================================
+    
     @Test
     void shouldFailEnrollmentWhenCourseNotFound() {
         // Given – payload with a non-existent course id
@@ -235,9 +235,9 @@ class EnrollmentControllerIntegrationTest {
         verify(libraryClient, never()).registerStudent(any());
     }
 
-    // =========================================================================
+    
     // Test 3 – POST /api/enrollments  →  fails on duplicate enrollment
-    // =========================================================================
+    
     @Test
     void shouldFailWhenStudentAlreadyEnrolled() {
         // Given – student is already enrolled in this course
@@ -270,10 +270,10 @@ class EnrollmentControllerIntegrationTest {
         assertThat(enrollmentRepository.findAll()).hasSize(1);
     }
 
-    // =========================================================================
+    
     // Test 4 – POST /api/enrollments  →  forbidden for ADMIN role
     //          (only STUDENT users can enroll - enforced by AuthenticatedUserService)
-    // =========================================================================
+    
     @Test
     void shouldFailEnrollmentWhenUserIsNotStudent() {
         // Given – payload with a valid course id
@@ -294,9 +294,9 @@ class EnrollmentControllerIntegrationTest {
                 || response.getStatusCode().is5xxServerError()).isTrue();
     }
 
-    // =========================================================================
+    
     // Test 5 – POST /api/enrollments  →  fails validation when courseId missing
-    // =========================================================================
+    
     @Test
     void shouldFailEnrollmentWhenCourseIdMissing() {
         // Given – empty payload (no courseId)
@@ -315,9 +315,9 @@ class EnrollmentControllerIntegrationTest {
         assertThat(response.getStatusCode().is4xxClientError()).isTrue();
     }
 
-    // =========================================================================
+    
     // Test 6 – GET /api/enrollments/me  →  returns empty list for new student
-    // =========================================================================
+    
     @Test
     void shouldReturnEmptyListWhenStudentHasNoEnrollments() {
         // Given – student profile exists but no enrollments
@@ -339,9 +339,9 @@ class EnrollmentControllerIntegrationTest {
         assertThat(response.getBody()).isNotNull().isEmpty();
     }
 
-    // =========================================================================
+    
     // Test 7 – GET /api/enrollments/me  →  returns enrollments after enrolling
-    // =========================================================================
+    
     @Test
     void shouldReturnEnrollmentsForCurrentStudent() {
         // Given – student enrolls in a course first
@@ -370,9 +370,9 @@ class EnrollmentControllerIntegrationTest {
         assertThat(response.getBody()[0].getCourseTitle()).isEqualTo("Introduction to Computer Science");
     }
 
-    // =========================================================================
+    
     // Test 8 – GET /api/enrollments/me  →  fails when student profile missing
-    // =========================================================================
+    
     @Test
     void shouldFailGetEnrollmentsWhenStudentProfileNotFound() {
         // Given – studentUser exists but no Student profile created yet
@@ -389,9 +389,9 @@ class EnrollmentControllerIntegrationTest {
                 || response.getStatusCode().is5xxServerError()).isTrue();
     }
 
-    // =========================================================================
+    
     // Test 9 – Endpoints require authentication
-    // =========================================================================
+    
     @Test
     void shouldReturn401WhenNoTokenProvidedOnEnroll() {
         // Given – payload with valid course id but no Authorization header
